@@ -51,6 +51,33 @@ The best setting needs the embedding learning rate **10x** the default. Every ag
 
 ---
 
+## Use Opus only when one training run costs more than about 40 H100-seconds
+
+We priced both sides:
+- **Laptop:** a $2,000 MacBook used for 3 years, so one 9-second training run costs $0.00018.
+- **Opus 5.5 at API list price:** $4 per million input tokens, $5 per million cache-write tokens, $0.20 per million cache-read tokens, $20 per million output tokens. We counted the tokens of every Opus run.
+
+| what you buy | cost | final validation loss |
+|---|---|---|
+| 1 training run, default settings | $0.0002 | 1.953 |
+| 7 training runs, settings picked at random from the sweep | $0.0013 | 1.886 (average) |
+| 19 training runs (the whole sweep) | $0.0034 | 1.878 |
+| 1 training run, Opus makes 1 decision (at step 200) | $0.42 | 1.948 |
+| 1 training run, Opus makes 3 decisions | $0.33 | 1.894 |
+| 1 training run, Opus makes 7 decisions (3 runs) | $0.45 (average) | 1.888 (average) |
+
+One Opus run with 7 decisions reaches the same loss as about 7 random training runs, so it saves 6 runs. It is worth it when 6 runs cost more than Opus, which is when one run costs more than **$0.075**. That is about 1 hour on the laptop or **39 seconds on an H100** at $6.89 per hour.
+
+![cost](cost.png)
+
+> **On our laptop, one Opus run costs as much as about 2,500 training runs, so more runs win. For training runs longer than about 40 H100-seconds, Opus wins.**
+
+Most of the Opus cost does not grow with the number of decisions. Half or more of it is writing the agent's starting instructions into the cache, which happens once per run. The 3-decision run was the cheapest because its cache write was smaller. All 5 Opus runs together would cost $2.09 at list price; we ran them on the $20 per month Claude plan.
+
+`python3 cost.py` prints these numbers and draws the chart. Token counts are in `agent_tokens.jsonl`.
+
+---
+
 ## Where it stops working
 
 > [!WARNING]

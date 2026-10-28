@@ -1,0 +1,4 @@
+{"step": 100, "config": {"muon_lr": 0.02, "momentum": 0.95, "adam_lr": 0.003, "weight_decay": 0.0}, "train_loss_first": 5.5691, "train_loss_last10": 2.3177, "train_loss_max": 5.5691, "val": 2.3133, "sec": 1.72}
+{"step": 200, "config": {"muon_lr": 0.04, "momentum": 0.95, "adam_lr": 0.008, "weight_decay": 0.0}, "train_loss_first": 2.248, "train_loss_last10": 2.0078, "train_loss_max": 2.4281, "val": 2.1026, "sec": 1.97}
+{"step": 300, "config": {"muon_lr": 0.025, "momentum": 0.95, "adam_lr": 0.005, "weight_decay": 0.0}, "train_loss_first": 1.9414, "train_loss_last10": 1.8297, "train_loss_max": 2.0817, "val": 1.9848, "sec": 1.72}
+{"step": 400, "config": {"muon_lr": 0.008, "momentum": 0.95, "adam_lr": 0.0015, "weight_decay": 0.0}, "train_loss_first": 1.7765, "train_loss_last10": 1.7271, "train_loss_max": 1.9268, "val": 1.8941, "sec": 1.73}

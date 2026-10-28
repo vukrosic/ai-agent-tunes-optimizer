@@ -1,0 +1,1 @@
+step 200: muon_lr 0.01, momentum 0.95, adam_lr 0.0015, weight_decay 0.0 — training stable (val 2.085), no schedule in segments, so halve both lrs as a one-step cooldown matching the mean lr of a linear decay over steps 200-400

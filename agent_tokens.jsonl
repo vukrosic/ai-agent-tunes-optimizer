@@ -1,0 +1,5 @@
+{"run": "opus_d1", "model": "claude-opus-5-5", "api_calls": 4, "wall_sec": 22, "input": 8, "cache_write": 71116, "cache_read": 202683, "output": 1092}
+{"run": "opus_d3", "model": "claude-opus-5-5", "api_calls": 7, "wall_sec": 30, "input": 14, "cache_write": 38905, "cache_read": 463025, "output": 1944}
+{"run": "opus1", "model": "claude-opus-5-5", "api_calls": 10, "wall_sec": 46, "input": 20, "cache_write": 73046, "cache_read": 632398, "output": 3123}
+{"run": "opus3", "model": "claude-opus-5-5", "api_calls": 10, "wall_sec": 46, "input": 20, "cache_write": 37071, "cache_read": 667687, "output": 3360}
+{"run": "opus2", "model": "claude-opus-5-5", "api_calls": 11, "wall_sec": 49, "input": 22, "cache_write": 37397, "cache_read": 741774, "output": 3472}

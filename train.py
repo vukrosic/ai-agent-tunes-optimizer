@@ -2,7 +2,7 @@
 
 python3 train.py static --lr 0.02 [--adam 0.003] [--decay [--decay_from N]]   one full run with fixed settings (lr optionally decays linearly to 0 from step N)
 python3 train.py reset --run NAME             start an agent run in runs/NAME/: fresh model, config.json = default settings
-python3 train.py segment --run NAME           train the next 50 steps with runs/NAME/config.json, print the log (history: runs/NAME/log.jsonl)
+python3 train.py segment --run NAME [--seg N]  train the next N (default 50) steps with runs/NAME/config.json, print the log (history: runs/NAME/log.jsonl)
 Model: 3 layers, width 64, 4 heads, RoPE, QK-norm, RMSNorm, SwiGLU, no biases, tied embeddings, 64 tokens of context.
 Hidden matrices train with Muon; embeddings and norm gains train with Adam. 400 steps, batch 16, ~8 s on one CPU thread.
 """
@@ -112,7 +112,7 @@ def log(row):
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(); ap.add_argument("cmd"); ap.add_argument("--lr", type=float, default=0.02); ap.add_argument("--decay", action="store_true"); ap.add_argument("--adam", type=float, default=0.003); ap.add_argument("--decay_from", type=int, default=0); ap.add_argument("--run", default="sonnet")
+    ap = argparse.ArgumentParser(); ap.add_argument("cmd"); ap.add_argument("--lr", type=float, default=0.02); ap.add_argument("--decay", action="store_true"); ap.add_argument("--adam", type=float, default=0.003); ap.add_argument("--decay_from", type=int, default=0); ap.add_argument("--run", default="sonnet"); ap.add_argument("--seg", type=int, default=SEG)
     a = ap.parse_args(); rd = os.path.join(HERE, "runs", a.run); os.makedirs(rd, exist_ok=True)
     ck, cf, rl = (os.path.join(rd, f) for f in ("run.pt", "config.json", "log.jsonl"))
     if a.cmd == "static":
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         step = s["step"]
         if step >= STEPS: print("training finished"); raise SystemExit
         c = dict(DEFAULT, **json.load(open(cf)))
-        t0 = time.time(); losses = train_steps(m, o, c, step, step + SEG); v = val(m); step += SEG
+        t0 = time.time(); losses = train_steps(m, o, c, step, min(STEPS, step + a.seg)); v = val(m); step = min(STEPS, step + a.seg)
         torch.save(dict(m=m.state_dict(), o=o.__dict__ | dict(mats=None, rest=None), step=step), ck)
         row = dict(step=step, config=c, train_loss_first=round(losses[0], 4), train_loss_last10=round(sum(losses[-10:]) / 10, 4),
                    train_loss_max=round(max(losses), 4), val=round(v, 4), sec=round(time.time() - t0, 2))

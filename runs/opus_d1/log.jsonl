@@ -1,0 +1,2 @@
+{"step": 200, "config": {"muon_lr": 0.02, "momentum": 0.95, "adam_lr": 0.003, "weight_decay": 0.0}, "train_loss_first": 5.5691, "train_loss_last10": 2.0081, "train_loss_max": 5.5691, "val": 2.0854, "sec": 3.59}
+{"step": 400, "config": {"muon_lr": 0.01, "momentum": 0.95, "adam_lr": 0.0015, "weight_decay": 0.0}, "train_loss_first": 1.9637, "train_loss_last10": 1.7794, "train_loss_max": 2.1037, "val": 1.9476, "sec": 3.67}
