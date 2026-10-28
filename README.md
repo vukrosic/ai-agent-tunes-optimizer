@@ -78,6 +78,18 @@ Most of the Opus cost does not grow with the number of decisions. Half or more o
 
 ---
 
+## Research task: find where the agent fails and fix it
+
+Agents can change a model's optimizer while it trains, but they often miss the biggest gains or make changes that hurt.
+
+Take an agent harness of your choice (Claude Code, Codex) and a small transformer LLM that trains in a few seconds. Let the agent change anything about the optimizer during training.
+
+Find cases where the agent makes things worse or misses a clear improvement. Once you have reproduced the problem, identify likely root causes and try some ways to fix it, such as different prompts, more information in the logs, or fewer or more decisions.
+
+Rerun your evals and see what works and what doesn't. Send your code, raw run logs, and a short write-up of what you tried and found (in a shared GitHub repo if possible). Use any models you have access to, and keep the total spend small.
+
+---
+
 ## Where it stops working
 
 > [!WARNING]
