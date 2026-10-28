@@ -1,80 +1,84 @@
 # Let an AI agent tune the optimizer while your LLM trains
 
+<p>
+<img src="setups.png" width="49%" alt="final loss for 5 ways of supervising training">
+<img src="curves.png" width="49%" alt="validation loss curves">
+</p>
+
 ## Abstract
 
-**An AI agent (Claude) watched a language model train and changed the optimizer settings every 50 training steps.** It could not restart training or undo a change.
+**An AI agent (Claude Opus) improved the optimizer of a small language model while it trained.** It could not restart training or undo a change.
 
-**In one run, the agent got close to the best of 19 hand-tuned runs.** Three repeated Claude Opus runs ended almost the same.
+**In one training run, Opus got close to the best of 19 hand-tuned runs, every time.** It found a better learning-rate schedule than the sweep but missed the best learning rates.
 
-**The agent found a better learning-rate schedule than the sweep, but missed the best learning rates.** Putting the two together gave the best model.
+**Watching training closely did not help.** Writing the optimizer once before training was as good as watching every step live. Forcing the agent to make changes made it a little worse.
 
 This is a small version of [Reactive Optimizers (OPAL)](https://xingjianbai.com/reactive-optimizers/), the MIT paper where an agent rewrites the optimizer during training.
 
 > [!IMPORTANT]
-> Validation loss (how wrong the model's next-letter guesses are, lower is better): default settings **1.953**, Claude Opus **1.890 / 1.888 / 1.886** in 3 runs, best of 19 tuned runs **1.878**, tuned learning rates + the agent's schedule **1.864**.
-
-![curves](curves.png)
+> Validation loss (how wrong the model's next-letter guesses are, lower is better): default settings **1.953**, Opus **1.885–1.896** on average in every setup, best of 19 tuned runs **1.878**, tuned learning rates + the agent's schedule **1.864**.
 
 ---
 
-## Training is repeatable, so differences come from the agent
+## How each run works
 
-Every run starts from the same weights and sees the same data in the same order. The default settings, run 3 times, gave **1.9526** every time.
+1. A tiny language model trains for 400 steps (about 9 seconds on a laptop). Every run starts from the same weights and sees the same data in the same order, so the default optimizer gives **1.9526** every time.
+2. Opus gets a folder with the model, the data, the optimizer code and a training script, and is told to improve the training.
+3. It may rewrite anything in the optimizer code. It may not touch the model, the data or the 400 steps, and it may not restart.
+4. After step 400 we reload the final model with an untouched copy of the model code and recompute the validation loss. All 25 numbers matched what the agent reported.
 
-> **Any difference between agent runs comes only from the agent's choices.**
+> **Any difference between runs comes only from the agent's choices.**
 
-## Opus gets close to a 19-run sweep in one run, every time
+## Supervising training closely does not help: the 4 setups without forced changes score the same
 
-| who sets the optimizer | runs needed | final validation loss |
+The five setups differ only in **when** Opus can change the optimizer. Each ran 5 times, one run at a time.
+
+| setup | what Opus can do | average loss (5 runs) |
 |---|---|---|
-| nobody (default settings) | 1 | 1.953 |
-| Claude Sonnet | 1 | 1.900 |
-| Claude Opus, 3 separate runs | 1 each | 1.890, 1.888, 1.886 |
-| best of 19 fixed settings (learning-rate sweep) | 19 | 1.878 |
-| **sweep's learning rates + the agent's schedule** | 1 | **1.864** |
+| writes once | edits the optimizer, then trains all 400 steps in one go | 1.887 |
+| decides when | trains any number of steps at a time and may edit between calls | 1.887 |
+| forced to look | like "decides when", plus training pauses at steps 100, 200, 300 | **1.885** |
+| watches live | sees the loss every step while training runs; edits take over from the next step | 1.886 |
+| forced to change | training stops at steps 100, 200, 300 until the optimizer code has changed | 1.896 |
+| *best of 19 tuned runs, no agent* | | *1.878* |
 
-The 3 Opus runs ended within 0.004 of each other and closed **87%** of the gap between the default and the sweep. Sonnet closed 70%.
+The four setups that do not force a change are within 0.002 of each other. Run-to-run spread is about 0.008, so they are the same. Exact prompts are in [setups/PROMPTS.md](setups/PROMPTS.md).
+
+> **Let Opus write the optimizer once before training. Watching training did not make it better here.**
+
+## Do not force the agent to change things
+
+Forced runs average **1.896**, about 0.01 worse than the rest. Most forced changes were made because the script required them, not because the loss showed a problem. This comparison was picked after seeing the data, so treat it as a lead.
+
+## The agent rarely steps in by itself
+
+**20 of 25 runs never changed the optimizer after step 0.** In "forced to look" it saw the loss three times per run and changed nothing in all 5 runs. Only 3 "watches live" runs changed it mid-training.
+
+Almost every run made the same plan at step 0: about 2× higher learning rates, a short warmup, hold, then decay to 0 over the last 150–250 steps.
 
 ## Keep the learning rate high, then drop it fast at the end
 
-Every agent run did the same thing: raise both learning rates early, hold them, then cut them over the last 150–200 steps. That is close to the warmup-stable-decay schedule used to train large LLMs.
-
-With the default learning rates, this late drop improves the loss by **0.046**. A straight-line decay from the start improves it by only 0.006.
+That plan is close to the warmup-stable-decay schedule used to train large LLMs. With the default learning rates, a late drop improves the loss by **0.046**; a straight-line decay from the start improves it by only 0.006.
 
 ## The agent missed the biggest win: the embedding learning rate
 
 The model has two learning rates: one for the hidden weight matrices (trained with **Muon**) and one for the **embedding table**, which turns each letter into a vector (trained with **Adam**).
 
-The best setting needs the embedding learning rate **10x** the default. Every agent moved both learning rates together, so the embedding one only went up about 2x.
+The best setting raises the embedding learning rate **10×**. Most agent runs raised it 2–3×. The one run that measured it (it tried several step sizes on spare training batches) went to 5× and still ended at 1.891.
 
-> **The sweep found better learning rates and the agents found a better schedule. Using both gave 1.864.**
+> **The sweep found better learning rates and the agent found a better schedule. Using both gave 1.864, the best result.**
 
 ---
 
 ## Use Opus only when one training run costs more than about 40 H100-seconds
 
-We priced both sides:
-- **Laptop:** a $2,000 MacBook used for 3 years, so one 9-second training run costs $0.00018.
-- **Opus 5.5 at API list price:** $4 per million input tokens, $5 per million cache-write tokens, $0.20 per million cache-read tokens, $20 per million output tokens. We counted the tokens of every Opus run.
-
-| what you buy | cost | final validation loss |
+| what you buy | cost | loss |
 |---|---|---|
-| 1 training run, default settings | $0.0002 | 1.953 |
-| 7 training runs, settings picked at random from the sweep | $0.0013 | 1.886 (average) |
-| 19 training runs (the whole sweep) | $0.0034 | 1.878 |
-| 1 training run, Opus makes 1 decision (at step 200) | $0.42 | 1.948 |
-| 1 training run, Opus makes 3 decisions | $0.33 | 1.894 |
-| 1 training run, Opus makes 7 decisions (3 runs) | $0.45 (average) | 1.888 (average) |
+| 1 run, default settings | $0.0002 | 1.953 |
+| 7 runs with random sweep settings | $0.0013 | 1.886 |
+| 1 run with Opus | $0.45 | 1.888 |
 
-One Opus run with 7 decisions reaches the same loss as about 7 random training runs, so it saves 6 runs. It is worth it when 6 runs cost more than Opus, which is when one run costs more than **$0.075**. That is about 1 hour on the laptop or **39 seconds on an H100** at $6.89 per hour.
-
-![cost](cost.png)
-
-> **On our laptop, one Opus run costs as much as about 2,500 training runs, so more runs win. For training runs longer than about 40 H100-seconds, Opus wins.**
-
-Most of the Opus cost does not grow with the number of decisions. Half or more of it is writing the agent's starting instructions into the cache, which happens once per run. The 3-decision run was the cheapest because its cache write was smaller. All 5 Opus runs together would cost $2.09 at list price; we ran them on the $20 per month Claude plan.
-
-`python3 cost.py` prints these numbers and draws the chart. Token counts are in `agent_tokens.jsonl`.
+One Opus run matches about 7 random runs. It pays off when one training run costs more than **$0.075**: about 1 hour on the laptop or **39 seconds on an H100**. Opus at API list price; details and `cost.png` in [RESULTS.md](RESULTS.md).
 
 ---
 
@@ -90,20 +94,24 @@ Rerun your evals and see what works and what doesn't. Send your code, raw run lo
 
 ---
 
+## Conclusion
+
+On a short, smooth training run, Opus makes one good plan at the start: higher learning rates and a late decay. Watching the run adds nothing, and forcing extra changes hurts. What it misses is the balance between the two learning rates, which a cheap sweep finds. Use the sweep for the learning rates and the agent's schedule on top.
+
 ## Where it stops working
 
 > [!WARNING]
-> One small model, 400 steps, 8 decisions per run. The agent could change only 4 numbers (two learning rates, momentum, weight decay); OPAL's agent rewrites the optimizer code and makes about 100 decisions. The agent saw only losses; it might find the learning-rate balance if it saw per-layer statistics.
+> One small model, 400 steps, losses that fell smoothly in every run. On long runs where something goes wrong mid-training (loss spikes), watching may matter more; we did not test that. 5 runs per setup can show differences of about 0.01, not smaller.
 
 ## Setup
 
-Byte-level transformer on TinyShakespeare: 3 layers, width 64, RoPE, QK-norm, RMSNorm, SwiGLU, no biases. Muon on hidden matrices, Adam on the embedding and norm gains. 400 steps, batch 16, 64 tokens of context, about 9 seconds per run on one CPU thread.
+Byte-level transformer on TinyShakespeare: 3 layers, width 64, RoPE, QK-norm, RMSNorm, SwiGLU, no biases. Muon on hidden matrices, Adam on the embedding and norm gains. 400 steps, batch 16, 64 tokens of context. Agent: Claude Opus 5.5 in Claude Code.
 
-Short paper with all numbers: [paper.md](paper.md). Each agent's reasons for its changes: `runs/<name>/decisions.md`.
+All numbers, per-run tables and what each run changed: [RESULTS.md](RESULTS.md). Raw logs and every optimizer version: `runs/<setup>_<n>/`.
 
 ```bash
-python3 train.py static --lr 0.02 --adam 0.03 --decay --decay_from 250   # one fixed run
-python3 train.py reset --run NAME                                         # start an agent run in runs/NAME/
-python3 train.py segment --run NAME                                       # train 50 steps with runs/NAME/config.json; the agent edits it between segments
-python3 plot.py
+bash setups/make.sh look /tmp/look_1     # fresh run folder for one setup (before, free, look, live, forced); give it to the agent
+python3 setups/check.py look_1           # recompute the final loss from runs/look_1/ckpt.pt and list when the optimizer changed
+python3 setups/chart.py                  # setups.png
+python3 plot.py                          # curves.png
 ```

@@ -1,8 +1,0 @@
-{"step": 50, "config": {"muon_lr": 0.02, "momentum": 0.95, "adam_lr": 0.003, "weight_decay": 0.0}, "train_loss_first": 5.5691, "train_loss_last10": 2.7185, "train_loss_max": 5.5691, "val": 2.664, "sec": 0.98}
-{"step": 100, "config": {"muon_lr": 0.02, "momentum": 0.95, "adam_lr": 0.004, "weight_decay": 0.0}, "train_loss_first": 2.5969, "train_loss_last10": 2.3036, "train_loss_max": 2.6474, "val": 2.2995, "sec": 0.98}
-{"step": 150, "config": {"muon_lr": 0.025, "momentum": 0.95, "adam_lr": 0.004, "weight_decay": 0.0}, "train_loss_first": 2.2258, "train_loss_last10": 2.1235, "train_loss_max": 2.4013, "val": 2.1611, "sec": 1.14}
-{"step": 200, "config": {"muon_lr": 0.025, "momentum": 0.95, "adam_lr": 0.004, "weight_decay": 0.0}, "train_loss_first": 2.0994, "train_loss_last10": 1.9919, "train_loss_max": 2.1413, "val": 2.0887, "sec": 0.98}
-{"step": 250, "config": {"muon_lr": 0.025, "momentum": 0.95, "adam_lr": 0.004, "weight_decay": 0.0}, "train_loss_first": 1.9346, "train_loss_last10": 1.9312, "train_loss_max": 2.077, "val": 2.0323, "sec": 0.92}
-{"step": 300, "config": {"muon_lr": 0.018, "momentum": 0.95, "adam_lr": 0.003, "weight_decay": 0.0}, "train_loss_first": 1.9122, "train_loss_last10": 1.8331, "train_loss_max": 2.008, "val": 1.9983, "sec": 1.14}
-{"step": 350, "config": {"muon_lr": 0.012, "momentum": 0.95, "adam_lr": 0.002, "weight_decay": 0.0}, "train_loss_first": 1.7831, "train_loss_last10": 1.7603, "train_loss_max": 1.9311, "val": 1.9341, "sec": 1.05}
-{"step": 400, "config": {"muon_lr": 0.005, "momentum": 0.95, "adam_lr": 0.001, "weight_decay": 0.0}, "train_loss_first": 1.7801, "train_loss_last10": 1.7213, "train_loss_max": 1.8703, "val": 1.9004, "sec": 0.95}

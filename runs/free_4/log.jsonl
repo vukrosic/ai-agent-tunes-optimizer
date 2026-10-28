@@ -1,0 +1,5 @@
+{"step": 50, "val": 2.5537, "train_loss_first": 5.5691, "train_loss_last": 2.5606, "train_loss_max": 5.5691, "sec": 4.83}
+{"step": 100, "val": 2.2727, "train_loss_first": 2.4764, "train_loss_last": 2.2277, "train_loss_max": 2.5616, "sec": 5.07}
+{"step": 180, "val": 2.1052, "train_loss_first": 2.1932, "train_loss_last": 2.0002, "train_loss_max": 2.3594, "sec": 8.11}
+{"step": 290, "val": 1.994, "train_loss_first": 1.9362, "train_loss_last": 1.8715, "train_loss_max": 2.0799, "sec": 10.82}
+{"step": 400, "val": 1.8969, "train_loss_first": 1.8414, "train_loss_last": 1.7537, "train_loss_max": 1.9373, "sec": 10.86}

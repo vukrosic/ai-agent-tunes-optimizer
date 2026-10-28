@@ -1,3 +1,4 @@
 run.pt
 config.json
 __pycache__/
+ckpt.pt
