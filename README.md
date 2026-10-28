@@ -52,7 +52,7 @@ Forced runs average **1.896**, about 0.01 worse than the rest. Most forced chang
 
 ## The agent rarely steps in by itself
 
-**20 of 25 runs never changed the optimizer after step 0.** In "forced to look" it saw the loss three times per run and changed nothing in all 5 runs. Only 3 "watches live" runs changed it mid-training.
+**Of the 20 runs where changing was optional, 17 never changed the optimizer after step 0.** In "forced to look" it saw the loss three times per run and changed nothing in all 5 runs. Only 3 "watches live" runs changed it mid-training.
 
 Almost every run made the same plan at step 0: about 2× higher learning rates, a short warmup, hold, then decay to 0 over the last 150–250 steps.
 

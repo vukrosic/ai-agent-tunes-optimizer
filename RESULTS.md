@@ -112,7 +112,7 @@ Steps at which a new `optimizer.py` took over, from the saved copy of every vers
 
 1. **Supervision does not help on this run.** Writing the optimizer once (1.887) is as good as deciding when to step in (1.887), being made to look (1.885) or watching live (1.886).
 2. **Forcing changes hurts a little.** Forced averages 1.896, about 0.01 worse than the rest. Most forced changes were made because the script required them, not because the loss showed a problem.
-3. **The agent rarely steps in by itself.** 20 of 25 runs never changed the code after step 0. In the look setup it was shown the loss three times per run and changed nothing in all 5 runs.
+3. **The agent rarely steps in by itself.** Of the 20 runs where changing was optional, 17 never changed the code after step 0; the 3 that did were all in the live setup. In the look setup it was shown the loss three times per run and changed nothing in all 5 runs.
 4. **The agent still misses the embedding learning rate.** Most runs raised it 2–3×, against the 10× the sweep found. The one run that measured it (live 1) moved it to 5× and still ended at 1.891.
 
 ---
