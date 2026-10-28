@@ -1,8 +1,8 @@
 """Tiny byte-level LLM on TinyShakespeare whose optimizer settings can change during training.
 
 python3 train.py static --lr 0.02 [--adam 0.003] [--decay [--decay_from N]]   one full run with fixed settings (lr optionally decays linearly to 0 from step N)
-python3 train.py reset                        start an agent run: fresh model, config.json = default settings
-python3 train.py segment                      train the next 50 steps with the settings in config.json, print the log
+python3 train.py reset --run NAME             start an agent run in runs/NAME/: fresh model, config.json = default settings
+python3 train.py segment --run NAME           train the next 50 steps with runs/NAME/config.json, print the log (history: runs/NAME/log.jsonl)
 Model: 3 layers, width 64, 4 heads, RoPE, QK-norm, RMSNorm, SwiGLU, no biases, tied embeddings, 64 tokens of context.
 Hidden matrices train with Muon; embeddings and norm gains train with Adam. 400 steps, batch 16, ~8 s on one CPU thread.
 """
@@ -112,8 +112,9 @@ def log(row):
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(); ap.add_argument("cmd"); ap.add_argument("--lr", type=float, default=0.02); ap.add_argument("--decay", action="store_true"); ap.add_argument("--adam", type=float, default=0.003); ap.add_argument("--decay_from", type=int, default=0)
-    a = ap.parse_args(); ck, cf, rl = (os.path.join(HERE, f) for f in ("run.pt", "config.json", "run_log.jsonl"))
+    ap = argparse.ArgumentParser(); ap.add_argument("cmd"); ap.add_argument("--lr", type=float, default=0.02); ap.add_argument("--decay", action="store_true"); ap.add_argument("--adam", type=float, default=0.003); ap.add_argument("--decay_from", type=int, default=0); ap.add_argument("--run", default="sonnet")
+    a = ap.parse_args(); rd = os.path.join(HERE, "runs", a.run); os.makedirs(rd, exist_ok=True)
+    ck, cf, rl = (os.path.join(rd, f) for f in ("run.pt", "config.json", "log.jsonl"))
     if a.cmd == "static":
         t0 = time.time(); m, o = fresh(); c = dict(DEFAULT, muon_lr=a.lr, adam_lr=a.adam); curve = []
         for s in range(0, STEPS, SEG):
