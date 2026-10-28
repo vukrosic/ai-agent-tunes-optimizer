@@ -77,7 +77,8 @@ The agent cannot restart or undo a segment. It never saw the sweep results or th
 | Opus controls the settings, run 2 | 1 | 1.888 |
 | Opus controls the settings, run 3 | 1 | 1.886 |
 | best of the sweep (Muon 0.02, Adam 0.03, linear decay) | 19 | 1.878 |
-| sweep's learning rates + late decay | 1 | **1.864** |
+| sweep's learning rates + late decay from step 250 (Sonnet's timing) | 1 | **1.864** |
+| sweep's learning rates + late decay from step 200 (Opus's timing) | 1 | **1.864** |
 
 What each agent did, as Muon learning rate / Adam learning rate:
 
