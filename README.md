@@ -2,7 +2,7 @@
 
 ## Abstract
 
-**An AI agent (Claude) watched a language model train and changed the optimizer settings every 50 training steps.** It could not restart or undo anything: one run, decisions made on the fly.
+**An AI agent (Claude) watched a language model train and changed the optimizer settings every 50 training steps.** It could not restart training or undo a change.
 
 **In one run, the agent got close to the best of 19 hand-tuned runs.** Three repeated Claude Opus runs ended almost the same.
 
@@ -47,7 +47,7 @@ The model has two learning rates: one for the hidden weight matrices (trained wi
 
 The best setting needs the embedding learning rate **10x** the default. Every agent moved both learning rates together, so the embedding one only went up about 2x.
 
-> **The sweep finds the right learning rates. The agent finds the right schedule. Together they beat both.**
+> **The sweep found better learning rates and the agents found a better schedule. Using both gave 1.864.**
 
 ---
 

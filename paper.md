@@ -97,7 +97,7 @@ No agent changed momentum or weight decay.
 1. **Opus is consistent and better than Sonnet.** The three Opus runs ended within 0.004 of each other. On average they closed 87% of the gap between the default settings and the 19-run sweep. Sonnet's single run closed 70%.
 2. **Agents tune the size of the learning rate but not the balance between the two.** Every agent scaled both learning rates by about the same factor, keeping the default Adam-to-Muon ratio of 0.15. The best fixed setting has a ratio of 1.5. That is the biggest single gain in the sweep, and no agent found it.
 3. **The agents' timing beats a linear decay.** Holding the learning rate up and then dropping it in the last 100–150 steps is close to the warmup-stable-decay schedules used to train large LLMs. With the default learning rates, Sonnet's timing gains 0.046, while a linear decay gains only 0.006.
-4. **A sweep and an agent find different things.** The sweep finds the right learning rates. The agent finds the right schedule shape. Together they give 1.864, which beats both.
+4. **The sweep and the agents found different things.** The sweep found better learning rates and the agents found a better schedule. Using both gives 1.864, lower than either alone.
 
 ## 5. Limits
 
